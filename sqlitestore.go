@@ -27,6 +27,12 @@ type SQLiteStore struct {
 	writePool *sql.DB
 	readPool  *sql.DB
 	log       *slog.Logger
+
+	totalCreates      int64
+	totalUpdates      int64
+	totalDeletes      int64
+	totalExtends      int64
+	totalOwnerChanges int64
 }
 
 func NewSQLiteStore(
@@ -471,6 +477,12 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 			if err != nil {
 				return fmt.Errorf("failed to commit transaction: %w", err)
 			}
+
+			s.totalCreates += int64(totalCreates)
+			s.totalDeletes += int64(totalDeletes)
+			s.totalExtends += int64(totalExtends)
+			s.totalUpdates += int64(totalUpdates)
+			s.totalOwnerChanges += int64(totalOwnerChanges)
 
 			s.log.Info("batch processed", "firstBlock", firstBlock, "lastBlock", lastBlock, "processingTime", time.Since(startTime).Milliseconds(), "creates", totalCreates, "updates", totalUpdates, "deletes", totalDeletes, "extends", totalExtends, "ownerChanges", totalOwnerChanges)
 
