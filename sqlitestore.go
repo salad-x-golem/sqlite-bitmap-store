@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
@@ -21,6 +22,15 @@ import (
 
 	arkivevents "github.com/salad-x-golem/arkiv-events"
 	"github.com/salad-x-golem/arkiv-events/events"
+)
+
+var (
+	// Metrics for tracking operations
+	metricCreates      = metrics.NewCounter("sqlite_bitmap_store/creates")
+	metricUpdates      = metrics.NewCounter("sqlite_bitmap_store/updates")
+	metricDeletes      = metrics.NewCounter("sqlite_bitmap_store/deletes")
+	metricExtends      = metrics.NewCounter("sqlite_bitmap_store/extends")
+	metricOwnerChanges = metrics.NewCounter("sqlite_bitmap_store/owner_changes")
 )
 
 type SQLiteStore struct {
@@ -209,6 +219,7 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload %s at block %d txIndex %d opIndex %d: %w", key.Hex(), block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
+						metricCreates.Inc(1)
 
 						for k, v := range stringAttributes {
 							err = cache.AddToStringBitmap(ctx, k, v, id)
@@ -280,6 +291,7 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload 0x%x at block %d txIndex %d opIndex %d: %w", key, block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
+						metricUpdates.Inc(1)
 
 						for k, v := range oldStringAttributes.Values {
 							err = cache.RemoveFromStringBitmap(ctx, k, v, id)
@@ -366,6 +378,7 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to delete payload: %w", err)
 						}
+						metricDeletes.Inc(1)
 
 					case operation.ExtendBTL != nil:
 
@@ -397,6 +410,7 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload at block %d txIndex %d opIndex %d: %w", block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
+						metricExtends.Inc(1)
 
 						err = cache.RemoveFromNumericBitmap(ctx, "$expiration", oldExpiration, id)
 						if err != nil {
@@ -438,6 +452,7 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload at block %d txIndex %d opIndex %d: %w", block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
+						metricOwnerChanges.Inc(1)
 
 						err = cache.RemoveFromStringBitmap(ctx, "$owner", oldOwner, id)
 						if err != nil {
