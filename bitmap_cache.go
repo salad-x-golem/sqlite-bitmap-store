@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/Arkiv-Network/sqlite-bitmap-store/store"
+	"github.com/salad-x-golem/sqlite-bitmap-store/store"
 	"golang.org/x/sync/errgroup"
 )
 

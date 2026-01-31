@@ -85,7 +85,7 @@ Four main tables:
 | [participle/v2](https://github.com/alecthomas/participle) | Query language parser |
 | [go-sqlite3](https://github.com/mattn/go-sqlite3) | SQLite driver |
 | [golang-migrate](https://github.com/golang-migrate/migrate) | Database migrations |
-| [arkiv-events](https://github.com/Arkiv-Network/arkiv-events) | Blockchain event structures |
+| [arkiv-events](https://github.com/salad-x-golem/arkiv-events) | Blockchain event structures |
 | [go-ethereum](https://github.com/ethereum/go-ethereum) | Address and Hash types |
 | [urfave/cli](https://github.com/urfave/cli) | CLI framework |
 | [sqlc](https://sqlc.dev) | Type-safe SQL code generation |

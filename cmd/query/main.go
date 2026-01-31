@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	sqlitestore "github.com/Arkiv-Network/sqlite-bitmap-store"
+	sqlitestore "github.com/salad-x-golem/sqlite-bitmap-store"
 	"github.com/urfave/cli/v2"
 )
 

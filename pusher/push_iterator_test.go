@@ -11,11 +11,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	arkivevents "github.com/Arkiv-Network/arkiv-events"
-	"github.com/Arkiv-Network/arkiv-events/events"
-	sqlitebitmapstore "github.com/Arkiv-Network/sqlite-bitmap-store"
-	"github.com/Arkiv-Network/sqlite-bitmap-store/pusher"
-	"github.com/Arkiv-Network/sqlite-bitmap-store/store"
+	arkivevents "github.com/salad-x-golem/arkiv-events"
+	"github.com/salad-x-golem/arkiv-events/events"
+	sqlitebitmapstore "github.com/salad-x-golem/sqlite-bitmap-store"
+	"github.com/salad-x-golem/sqlite-bitmap-store/pusher"
+	"github.com/salad-x-golem/sqlite-bitmap-store/store"
 )
 
 var _ = Describe("PushIterator", func() {

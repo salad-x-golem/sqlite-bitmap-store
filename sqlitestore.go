@@ -12,15 +12,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Arkiv-Network/sqlite-bitmap-store/store"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/salad-x-golem/sqlite-bitmap-store/store"
 
-	arkivevents "github.com/Arkiv-Network/arkiv-events"
-	"github.com/Arkiv-Network/arkiv-events/events"
+	arkivevents "github.com/salad-x-golem/arkiv-events"
+	"github.com/salad-x-golem/arkiv-events/events"
 )
 
 type SQLiteStore struct {

@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	arkivevents "github.com/Arkiv-Network/arkiv-events"
-	"github.com/Arkiv-Network/arkiv-events/tariterator"
-	sqlitestore "github.com/Arkiv-Network/sqlite-bitmap-store"
+	arkivevents "github.com/salad-x-golem/arkiv-events"
+	"github.com/salad-x-golem/arkiv-events/tariterator"
+	sqlitestore "github.com/salad-x-golem/sqlite-bitmap-store"
 	"github.com/urfave/cli/v2"
 )
 

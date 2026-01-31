@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/Arkiv-Network/sqlite-bitmap-store/store"
 	"github.com/RoaringBitmap/roaring/v2/roaring64"
+	"github.com/salad-x-golem/sqlite-bitmap-store/store"
 )
 
 func (t *AST) Evaluate(

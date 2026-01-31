@@ -1,9 +1,9 @@
-module github.com/Arkiv-Network/sqlite-bitmap-store
+module github.com/salad-x-golem/sqlite-bitmap-store
 
 go 1.25.4
 
 require (
-	github.com/Arkiv-Network/arkiv-events v0.0.4
+	github.com/salad-x-golem/arkiv-events v0.0.4
 	github.com/RoaringBitmap/roaring/v2 v2.14.4
 	github.com/alecthomas/participle/v2 v2.1.4
 	github.com/ethereum/go-ethereum v1.16.7

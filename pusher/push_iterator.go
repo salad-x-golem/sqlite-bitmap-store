@@ -4,8 +4,8 @@ import (
 	"context"
 	"iter"
 
-	arkivevents "github.com/Arkiv-Network/arkiv-events"
-	"github.com/Arkiv-Network/arkiv-events/events"
+	arkivevents "github.com/salad-x-golem/arkiv-events"
+	"github.com/salad-x-golem/arkiv-events/events"
 )
 
 type PushIterator struct {
