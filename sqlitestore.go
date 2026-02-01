@@ -26,8 +26,8 @@ import (
 
 var (
 	// Metrics for tracking operations
-	metricOperationStarted    = metrics.NewRegisteredCounter("arkiv_store/opertions_started", nil)
-	metricOperationSuccessful = metrics.NewRegisteredCounter("arkiv_store/opertions_successful", nil)
+	metricOperationStarted    = metrics.NewRegisteredCounter("arkiv_store/operations_started", nil)
+	metricOperationSuccessful = metrics.NewRegisteredCounter("arkiv_store/operations_successful", nil)
 	metricCreates             = metrics.NewRegisteredMeter("arkiv_store/creates", nil)
 	metricUpdates             = metrics.NewRegisteredMeter("arkiv_store/updates", nil)
 	metricDeletes             = metrics.NewRegisteredMeter("arkiv_store/deletes", nil)
@@ -150,6 +150,8 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 
 			startTime := time.Now()
 
+			metricOperationStarted.Inc(1)
+
 		mainLoop:
 			for _, block := range batch.Batch.Blocks {
 
@@ -173,8 +175,6 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						updatesMap[operation.Update.Key] = currentUpdates
 					}
 				}
-
-				metricOperationStarted.Inc(1)
 
 			operationLoop:
 				for _, operation := range block.Operations {
