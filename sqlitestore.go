@@ -26,23 +26,19 @@ import (
 
 var (
 	// Metrics for tracking operations
-	metricCreates      = metrics.NewCounter("sqlite_bitmap_store/creates")
-	metricUpdates      = metrics.NewCounter("sqlite_bitmap_store/updates")
-	metricDeletes      = metrics.NewCounter("sqlite_bitmap_store/deletes")
-	metricExtends      = metrics.NewCounter("sqlite_bitmap_store/extends")
-	metricOwnerChanges = metrics.NewCounter("sqlite_bitmap_store/owner_changes")
+	metricOperationStarted    = metrics.NewRegisteredCounter("arkiv_store/opertions_started", nil)
+	metricOperationSuccessful = metrics.NewRegisteredCounter("arkiv_store/opertions_successful", nil)
+	metricCreates             = metrics.NewRegisteredMeter("arkiv_store/creates", nil)
+	metricUpdates             = metrics.NewRegisteredMeter("arkiv_store/updates", nil)
+	metricDeletes             = metrics.NewRegisteredMeter("arkiv_store/deletes", nil)
+	metricExtends             = metrics.NewRegisteredMeter("arkiv_store/extends", nil)
+	metricOwnerChanges        = metrics.NewRegisteredMeter("arkiv_store/owner_changes", nil)
 )
 
 type SQLiteStore struct {
 	writePool *sql.DB
 	readPool  *sql.DB
 	log       *slog.Logger
-
-	totalCreates      int64
-	totalUpdates      int64
-	totalDeletes      int64
-	totalExtends      int64
-	totalOwnerChanges int64
 }
 
 func NewSQLiteStore(
@@ -178,7 +174,8 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 					}
 				}
 
-				// blockNumber := block.Number
+				metricOperationStarted.Inc(1)
+
 			operationLoop:
 				for _, operation := range block.Operations {
 
@@ -219,7 +216,6 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload %s at block %d txIndex %d opIndex %d: %w", key.Hex(), block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
-						metricCreates.Inc(1)
 
 						for k, v := range stringAttributes {
 							err = cache.AddToStringBitmap(ctx, k, v, id)
@@ -291,7 +287,6 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload 0x%x at block %d txIndex %d opIndex %d: %w", key, block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
-						metricUpdates.Inc(1)
 
 						for k, v := range oldStringAttributes.Values {
 							err = cache.RemoveFromStringBitmap(ctx, k, v, id)
@@ -378,7 +373,6 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to delete payload: %w", err)
 						}
-						metricDeletes.Inc(1)
 
 					case operation.ExtendBTL != nil:
 
@@ -410,7 +404,6 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload at block %d txIndex %d opIndex %d: %w", block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
-						metricExtends.Inc(1)
 
 						err = cache.RemoveFromNumericBitmap(ctx, "$expiration", oldExpiration, id)
 						if err != nil {
@@ -452,7 +445,6 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 						if err != nil {
 							return fmt.Errorf("failed to insert payload at block %d txIndex %d opIndex %d: %w", block.Number, operation.TxIndex, operation.OpIndex, err)
 						}
-						metricOwnerChanges.Inc(1)
 
 						err = cache.RemoveFromStringBitmap(ctx, "$owner", oldOwner, id)
 						if err != nil {
@@ -493,11 +485,12 @@ func (s *SQLiteStore) FollowEvents(ctx context.Context, iterator arkivevents.Bat
 				return fmt.Errorf("failed to commit transaction: %w", err)
 			}
 
-			s.totalCreates += int64(totalCreates)
-			s.totalDeletes += int64(totalDeletes)
-			s.totalExtends += int64(totalExtends)
-			s.totalUpdates += int64(totalUpdates)
-			s.totalOwnerChanges += int64(totalOwnerChanges)
+			metricCreates.Mark(int64(totalCreates))
+			metricUpdates.Mark(int64(totalUpdates))
+			metricDeletes.Mark(int64(totalDeletes))
+			metricExtends.Mark(int64(totalExtends))
+			metricOwnerChanges.Mark(int64(totalOwnerChanges))
+			metricOperationSuccessful.Inc(1)
 
 			s.log.Info("batch processed", "firstBlock", firstBlock, "lastBlock", lastBlock, "processingTime", time.Since(startTime).Milliseconds(), "creates", totalCreates, "updates", totalUpdates, "deletes", totalDeletes, "extends", totalExtends, "ownerChanges", totalOwnerChanges)
 
